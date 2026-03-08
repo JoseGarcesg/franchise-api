@@ -45,4 +45,13 @@ public class FranchiseController {
 
         return service.addProduct(franchiseId, branchId, product);
     }
+
+    @DeleteMapping("/{franchiseId}/branches/{branchId}/products/{productId}")
+    public Mono<Franchise> deleteProduct(
+            @PathVariable String franchiseId,
+            @PathVariable Long branchId,
+            @PathVariable Long productId) {
+
+        return service.deleteProduct(franchiseId, branchId, productId);
+    }
 }
