@@ -129,4 +129,14 @@ public class FranchiseService {
                                 ))
                 );
     }
+
+    public Mono<Franchise> updateFranchiseName(String franchiseId, String newName) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .flatMap(franchise -> {
+                    franchise.setName(newName);
+                    return repository.save(franchise);
+                });
+    }
 }

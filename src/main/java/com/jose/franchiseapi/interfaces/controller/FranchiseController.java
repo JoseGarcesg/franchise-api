@@ -72,4 +72,12 @@ public class FranchiseController {
 
         return service.getTopProductsByBranch(franchiseId);
     }
+
+    @PatchMapping("/{franchiseId}/name")
+    public Mono<Franchise> updateFranchiseName(
+            @PathVariable String franchiseId,
+            @RequestParam String name) {
+
+        return service.updateFranchiseName(franchiseId, name);
+    }
 }
