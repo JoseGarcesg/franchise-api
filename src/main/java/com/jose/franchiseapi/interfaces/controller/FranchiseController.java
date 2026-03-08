@@ -72,4 +72,31 @@ public class FranchiseController {
 
         return service.getTopProductsByBranch(franchiseId);
     }
+
+    @PatchMapping("/{franchiseId}/name")
+    public Mono<Franchise> updateFranchiseName(
+            @PathVariable String franchiseId,
+            @RequestParam String name) {
+
+        return service.updateFranchiseName(franchiseId, name);
+    }
+
+    @PatchMapping("/{franchiseId}/branches/{branchId}/name")
+    public Mono<Franchise> updateBranchName(
+            @PathVariable String franchiseId,
+            @PathVariable Long branchId,
+            @RequestParam String name) {
+
+        return service.updateBranchName(franchiseId, branchId, name);
+    }
+
+    @PatchMapping("/{franchiseId}/branches/{branchId}/products/{productId}/name")
+    public Mono<Franchise> updateProductName(
+            @PathVariable String franchiseId,
+            @PathVariable Long branchId,
+            @PathVariable Long productId,
+            @RequestParam String name) {
+
+        return service.updateProductName(franchiseId, branchId, productId, name);
+    }
 }

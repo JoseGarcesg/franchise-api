@@ -6,7 +6,9 @@ import com.jose.franchiseapi.domain.model.Product;
 import com.jose.franchiseapi.domain.repository.FranchiseRepository;
 import com.jose.franchiseapi.interfaces.dto.BranchTopProductDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +35,8 @@ public class FranchiseService {
     public Mono<Franchise> addBranch(String franchiseId, Branch branch) {
 
         return repository.findById(franchiseId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,"Franchise not found")))
                 .flatMap(franchise -> {
                     Long newId = franchise.getBranchCounter()+1;
                     franchise.setBranchCounter(newId);
@@ -46,21 +49,24 @@ public class FranchiseService {
     public Flux<Branch> getAllBranchesByFranchise(String franchiseId) {
 
         return repository.findById(franchiseId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,"Franchise not found")))
                 .flatMapMany(franchise -> Flux.fromIterable(franchise.getBranches()));
     }
 
     public Mono<Franchise> addProduct(String franchiseId, Long branchId, Product product) {
 
         return repository.findById(franchiseId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,"Franchise not found")))
                 .flatMap(franchise -> {
 
                     Branch branch = franchise.getBranches()
                             .stream()
                             .filter(b -> b.getId().equals(branchId))
                             .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Branch not found"));
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,"Branch not found"));
                     Long newId = franchise.getProductCounter()+1;
                     franchise.setProductCounter(newId);
                     product.setId(newId);
@@ -72,14 +78,16 @@ public class FranchiseService {
     public Mono<Franchise> deleteProduct(String franchiseId, Long branchId, Long productId) {
 
         return repository.findById(franchiseId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,"Franchise not found")))
                 .flatMap(franchise -> {
 
                     Branch branch = franchise.getBranches()
                             .stream()
                             .filter(b -> b.getId().equals(branchId))
                             .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Branch not found"));
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,"Branch not found"));
 
                     branch.getProducts()
                             .removeIf(p -> p.getId().equals(productId));
@@ -91,20 +99,23 @@ public class FranchiseService {
     public Mono<Franchise> updateStock(String franchiseId, Long branchId, Long productId, Integer stock) {
 
         return repository.findById(franchiseId)
-                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,"Franchise not found")))
                 .flatMap(franchise -> {
 
                     Branch branch = franchise.getBranches()
                             .stream()
                             .filter(b -> b.getId().equals(branchId))
                             .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Branch not found"));
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,"Branch not found"));
 
                     Product product = branch.getProducts()
                             .stream()
                             .filter(p -> p.getId().equals(productId))
                             .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Product not found"));
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,"Product not found"));
 
                     product.setStock(stock);
 
@@ -128,5 +139,60 @@ public class FranchiseService {
                                         product.getStock()
                                 ))
                 );
+    }
+
+    public Mono<Franchise> updateFranchiseName(String franchiseId, String newName) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .flatMap(franchise -> {
+                    franchise.setName(newName);
+                    return repository.save(franchise);
+                });
+    }
+
+    public Mono<Franchise> updateBranchName(String franchiseId, Long branchId, String newName) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,"Franchise not found")))
+                .flatMap(franchise -> {
+
+                    franchise.getBranches()
+                            .stream()
+                            .filter(branch -> branch.getId().equals(branchId))
+                            .findFirst()
+                            .ifPresent(branch -> branch.setName(newName));
+
+                    return repository.save(franchise);
+                });
+    }
+
+    public Mono<Franchise> updateProductName(
+            String franchiseId,
+            Long branchId,
+            Long productId,
+            String newName) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,"Franchise not found")))
+                .flatMap(franchise -> {
+
+                    franchise.getBranches()
+                            .stream()
+                            .filter(b -> b.getId().equals(branchId))
+                            .findFirst()
+                            .ifPresent(branch -> {
+
+                                branch.getProducts()
+                                        .stream()
+                                        .filter(p -> p.getId().equals(productId))
+                                        .findFirst()
+                                        .ifPresent(product -> product.setName(newName));
+                            });
+
+                    return repository.save(franchise);
+                });
     }
 }
