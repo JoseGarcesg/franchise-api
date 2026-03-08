@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+
+  mongodb:
+    image: mongo:7
+    container_name: franchise-mongodb
+    ports:
+      - "27017:27017"
+
+  franchise-api:
+    build: .
+    container_name: franchise-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
