@@ -33,9 +33,10 @@ public class FranchiseService {
         return repository.findById(franchiseId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
                 .flatMap(franchise -> {
-
+                    Long newId = franchise.getBranchCounter()+1;
+                    franchise.setBranchCounter(newId);
+                    branch.setId(newId);
                     franchise.getBranches().add(branch);
-
                     return repository.save(franchise);
                 });
     }
@@ -47,7 +48,7 @@ public class FranchiseService {
                 .flatMapMany(franchise -> Flux.fromIterable(franchise.getBranches()));
     }
 
-    public Mono<Franchise> addProduct(String franchiseId, String branchName, Product product) {
+    public Mono<Franchise> addProduct(String franchiseId, Long branchId, Product product) {
 
         return repository.findById(franchiseId)
                 .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
@@ -55,12 +56,13 @@ public class FranchiseService {
 
                     Branch branch = franchise.getBranches()
                             .stream()
-                            .filter(b -> b.getName().equalsIgnoreCase(branchName))
+                            .filter(b -> b.getId().equals(branchId))
                             .findFirst()
                             .orElseThrow(() -> new RuntimeException("Branch not found"));
-
+                    Long newId = franchise.getProductCounter()+1;
+                    franchise.setProductCounter(newId);
+                    product.setId(newId);
                     branch.getProducts().add(product);
-
                     return repository.save(franchise);
                 });
     }

@@ -37,12 +37,12 @@ public class FranchiseController {
         return service.addBranch(franchiseId, branch);
     }
 
-    @PostMapping("/{franchiseId}/branches/{branchName}/products")
+    @PostMapping("/{franchiseId}/branches/{branchId}/products")
     public Mono<Franchise> addProduct(
             @PathVariable String franchiseId,
-            @PathVariable String branchName,
+            @PathVariable Long branchId,
             @RequestBody Product product) {
 
-        return service.addProduct(franchiseId, branchName, product);
+        return service.addProduct(franchiseId, branchId, product);
     }
 }

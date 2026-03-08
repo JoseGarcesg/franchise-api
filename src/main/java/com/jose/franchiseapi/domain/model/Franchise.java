@@ -17,5 +17,7 @@ public class Franchise {
     @Id
     private String id;
     private String name;
+    private Long branchCounter = 0L;
+    private Long productCounter = 0L;
     private List<Branch> branches = new ArrayList<>();
 }
