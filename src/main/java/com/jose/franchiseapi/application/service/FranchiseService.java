@@ -40,5 +40,30 @@ public class FranchiseService {
                 });
     }
 
+    public Flux<Branch> getAllBranchesByFranchise(String franchiseId) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .flatMapMany(franchise -> Flux.fromIterable(franchise.getBranches()));
+    }
+
+    public Mono<Franchise> addProduct(String franchiseId, String branchName, Product product) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .flatMap(franchise -> {
+
+                    Branch branch = franchise.getBranches()
+                            .stream()
+                            .filter(b -> b.getName().equalsIgnoreCase(branchName))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Branch not found"));
+
+                    branch.getProducts().add(product);
+
+                    return repository.save(franchise);
+                });
+    }
+
 
 }
