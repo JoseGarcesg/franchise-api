@@ -80,4 +80,13 @@ public class FranchiseController {
 
         return service.updateFranchiseName(franchiseId, name);
     }
+
+    @PatchMapping("/{franchiseId}/branches/{branchId}/name")
+    public Mono<Franchise> updateBranchName(
+            @PathVariable String franchiseId,
+            @PathVariable Long branchId,
+            @RequestParam String name) {
+
+        return service.updateBranchName(franchiseId, branchId, name);
+    }
 }
