@@ -19,4 +19,12 @@ public class GlobalExceptionHandler {
                 .status(ex.getStatusCode())
                 .body(error);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+
+        return ResponseEntity
+                .status(500)
+                .body(new ErrorResponse("Internal server error"));
+    }
 }
