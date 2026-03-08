@@ -39,6 +39,7 @@ productos - Producto con mayor stock por sucursal
 
 # Cómo ejecutar el proyecto
 
+
 ## 1. Clonar el repositorio
 
 ``` bash
@@ -160,6 +161,20 @@ Ejemplo:
   "message": "Franchise not found"
 }
 ```
+
+## con Docker
+
+Construir imagen
+
+docker build -t franchise-api .
+
+Ejecutar contenedor
+
+docker run -p 8080:8080 franchise-api
+
+## con Docker compose
+
+docker compose up --build
 
 ------------------------------------------------------------------------
 
