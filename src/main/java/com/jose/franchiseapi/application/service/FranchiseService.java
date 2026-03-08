@@ -17,7 +17,6 @@ public class FranchiseService {
 
         Franchise franchise = new Franchise();
         franchise.setName(name);
-        franchise.setBranches(new ArrayList<>());
 
         return repository.save(franchise);
     }

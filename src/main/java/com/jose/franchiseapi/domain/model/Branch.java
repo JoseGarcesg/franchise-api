@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,5 +13,5 @@ import java.util.List;
 public class Branch {
 
     private String name;
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
 }
