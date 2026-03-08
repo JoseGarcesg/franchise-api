@@ -85,4 +85,28 @@ public class FranchiseService {
                     return repository.save(franchise);
                 });
     }
+
+    public Mono<Franchise> updateStock(String franchiseId, Long branchId, Long productId, Integer stock) {
+
+        return repository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new RuntimeException("Franchise not found")))
+                .flatMap(franchise -> {
+
+                    Branch branch = franchise.getBranches()
+                            .stream()
+                            .filter(b -> b.getId().equals(branchId))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Branch not found"));
+
+                    Product product = branch.getProducts()
+                            .stream()
+                            .filter(p -> p.getId().equals(productId))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+                    product.setStock(stock);
+
+                    return repository.save(franchise);
+                });
+    }
 }
