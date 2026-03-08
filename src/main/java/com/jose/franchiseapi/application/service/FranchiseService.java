@@ -4,12 +4,14 @@ import com.jose.franchiseapi.domain.model.Branch;
 import com.jose.franchiseapi.domain.model.Franchise;
 import com.jose.franchiseapi.domain.model.Product;
 import com.jose.franchiseapi.domain.repository.FranchiseRepository;
+import com.jose.franchiseapi.interfaces.dto.BranchTopProductDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -108,5 +110,23 @@ public class FranchiseService {
 
                     return repository.save(franchise);
                 });
+    }
+
+    public Flux<BranchTopProductDTO> getTopProductsByBranch(String franchiseId) {
+
+        return repository.findById(franchiseId)
+                .flatMapMany(franchise -> Flux.fromIterable(franchise.getBranches()))
+                .flatMap(branch ->
+
+                        Flux.fromIterable(branch.getProducts())
+                                .reduce((p1, p2) ->
+                                        p1.getStock() >= p2.getStock() ? p1 : p2
+                                )
+                                .map(product -> new BranchTopProductDTO(
+                                        branch.getName(),
+                                        product.getName(),
+                                        product.getStock()
+                                ))
+                );
     }
 }

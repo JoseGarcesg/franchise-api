@@ -4,6 +4,7 @@ import com.jose.franchiseapi.application.service.FranchiseService;
 import com.jose.franchiseapi.domain.model.Branch;
 import com.jose.franchiseapi.domain.model.Franchise;
 import com.jose.franchiseapi.domain.model.Product;
+import com.jose.franchiseapi.interfaces.dto.BranchTopProductDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -63,5 +64,12 @@ public class FranchiseController {
             @PathVariable Integer stock) {
 
         return service.updateStock(franchiseId, branchId, productId, stock);
+    }
+
+    @GetMapping("/{franchiseId}/top-products")
+    public Flux<BranchTopProductDTO> getTopProducts(
+            @PathVariable String franchiseId) {
+
+        return service.getTopProductsByBranch(franchiseId);
     }
 }
